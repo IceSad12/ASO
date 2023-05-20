@@ -1,0 +1,71 @@
+
+#ldap
+
+#1 configurar ip estática 
+yamal 
+borramos el dhcp 
+ponemos addresses: [ip]
+netplan apply 
+# This is the network config written by 'subiquity'
+network:
+  renderer: networkd
+  ethernets:
+    enp0s3:
+      addresses:
+        - 192.168.1.247/24
+      nameservers:
+        addresses: [4.2.2.2, 8.8.8.8]
+      routes:
+        - to: default
+          via: 192.168.1.1
+  
+  
+  #version: 2 LDAP
+
+#2 cambiar el nombre del host 
+sudo hostnamectl set-hostname ldapserver.hugo.local 
+
+
+y en etc/hosts ponemos la ip`nueva debajo y determinamos con ldapserver.hugo.local ldapserver 
+
+#3 instalamos ldap 
+sudo apt install slapd ldap-utils 
+1 contraseña admin 
+2 comando dpkg-reconfigure slapd
+1 no
+base de datos yes y yes 
+
+
+#4 comprobamos instalación con comando 
+sudo slapcat
+
+#5 creamos un archivo con el contenido de ldap 
+sudo slapcat > hugoldap.txt
+
+#6 archivo ldif 
+sudo nano ou.ldif
+
+sudo ldapadd -x -D cn=admin.dc=hugo,dc=local -W -f ou.ldif
+
+
+#7 añadimos un grupo en el archivo ldif 
+
+
+#8 usuario 
+sudo slappasswd 
+sudo ldapadd -x -D cn=admin.dc=hugo,dc=local -W -f usr.ldif
+dn: uid=lucas, ou=alumnos, dc=hugo, dc=local
+objectClass: top
+objectClass: posixAccount
+objectClass: inetOrgPerson
+cn: grupo
+uid: lucas
+ou: alumnos
+uidNumber: 2000
+gidNumber: 10000
+homeDirectory: /home/lucas
+loginShell: /bin/bash
+userPassword: 
+sn: Ortega 
+mail: lucas@hugo.local
+giveName: lucas
